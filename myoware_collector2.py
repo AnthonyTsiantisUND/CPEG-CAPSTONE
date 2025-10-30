@@ -236,7 +236,7 @@ class Collector:
         self.client = client
         self.device_addr = found.address
         self.device_name = found.name or ""
-        print("✅ Connected via scan match.")
+        print(" Connected via scan match.")
 
     async def async_task(self):
         await self.connect_auto()
