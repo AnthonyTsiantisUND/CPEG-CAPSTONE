@@ -1,4 +1,4 @@
-# myoware_dual_collector.py — Dual sensor support with fixed-rate sampling & synced timestamps
+# myoware_dual_collector.py — Dual sensor support with per-packet sampling
 # Keys:
 #   [1] flat hand   [2] closed fist
 #   SPACE = start/stop recording (uses selected label, both sensors)
@@ -27,14 +27,12 @@ LABELS = {
     "2": ("closed fist", "closed_fist"),
 }
 
-SAMPLE_INTERVAL_SEC = 0.01  # 100 Hz
+DATA_DIR = "dual_emg"
+os.makedirs(DATA_DIR, exist_ok=True)
 
 # Windows BLE loop policy
 if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-
-DATA_DIR = "dual_emg"
-os.makedirs(DATA_DIR, exist_ok=True)
 
 
 def next_sequential_filename(label_slug: str, sensor_id: str, ext: str = "csv") -> str:
@@ -70,7 +68,7 @@ class SensorState:
         self.latest_ascii: str = ""
         self.latest_hex: str = ""
 
-        # Sampled values used for plotting (fixed-rate sampler fills this)
+        # Sampled values used for plotting (notify handler fills this)
         self.values = []  # list[float]
 
         # Recorded rows for CSV
@@ -217,7 +215,7 @@ class DualCollector:
             await client.connect()
             if getattr(client, "is_connected", False):
                 st.client = client
-                print(f"✅ ({sensor_id}) Connected via preferred address.")
+                print(f" ({sensor_id}) Connected via preferred address.")
                 return
         except Exception as e:
             print(f"[WARN] ({sensor_id}) Preferred connect failed: {e}")
@@ -246,7 +244,7 @@ class DualCollector:
         if not getattr(client, "is_connected", False):
             raise RuntimeError(f"({sensor_id}) Device appeared, but connection failed.")
         st.client = client
-        print(f"✅ ({sensor_id}) Connected via scan match.")
+        print(f" ({sensor_id}) Connected via scan match.")
 
     def make_notify_handler(self, sensor_id: str):
         st = self.sensors[sensor_id]
@@ -264,6 +262,7 @@ class DualCollector:
             parts = re.split(r"[\r\n]+", st.line_buf)
             st.line_buf = parts[-1]
 
+            # Process complete lines
             for ln in parts[:-1]:
                 ln = ln.strip()
                 if not ln:
@@ -275,11 +274,28 @@ class DualCollector:
                     v = float(nums[0])  # first numeric token
                 except ValueError:
                     continue
+
+                ts = datetime.now().isoformat(timespec="milliseconds")
                 with self.lock:
                     st.latest_value = v
                     st.latest_ascii = ln
                     st.latest_hex = hexstr
                     st.last_data_time = time.time()
+                    # plotting buffer
+                    st.values.append(v)
+                    # recording buffer
+                    if self.recording and self.label_slug:
+                        st.rows.append({
+                            "timestamp": ts,
+                            "device": st.info["name"],
+                            "address": st.info["addr"],
+                            "char_uuid": st.char_uuid,
+                            "label": self.label_slug,
+                            "col_index": 1,
+                            "value": v,
+                            "payload_ascii": ln,
+                            "payload_hex": hexstr,
+                        })
 
             # Handle a single numeric still in buffer
             chunk = st.line_buf.strip()
@@ -288,11 +304,25 @@ class DualCollector:
                     v = float(chunk)
                 except ValueError:
                     return
+                ts = datetime.now().isoformat(timespec="milliseconds")
                 with self.lock:
                     st.latest_value = v
                     st.latest_ascii = chunk
                     st.latest_hex = hexstr
                     st.last_data_time = time.time()
+                    st.values.append(v)
+                    if self.recording and self.label_slug:
+                        st.rows.append({
+                            "timestamp": ts,
+                            "device": st.info["name"],
+                            "address": st.info["addr"],
+                            "char_uuid": st.char_uuid,
+                            "label": self.label_slug,
+                            "col_index": 1,
+                            "value": v,
+                            "payload_ascii": chunk,
+                            "payload_hex": hexstr,
+                        })
                 st.line_buf = ""
 
         return handler
@@ -317,33 +347,7 @@ class DualCollector:
 
         self.stop_event = asyncio.Event()
 
-        # Fixed-rate sampler: creates synchronized timestamps + samples
-        async def sampler():
-            while not self.stop_event.is_set():
-                ts = datetime.now().isoformat(timespec="milliseconds")
-                with self.lock:
-                    for sid, st in self.sensors.items():
-                        # Append to plotting buffer
-                        st.values.append(st.latest_value)
-
-                        # Append to recording rows if recording
-                        if self.recording and self.label_slug:
-                            st.rows.append({
-                                "timestamp": ts,
-                                "device": st.info["name"],
-                                "address": st.info["addr"],
-                                "char_uuid": st.char_uuid,
-                                "label": self.label_slug,
-                                "col_index": 1,
-                                "value": st.latest_value,
-                                "payload_ascii": st.latest_ascii,
-                                "payload_hex": st.latest_hex,
-                            })
-                await asyncio.sleep(SAMPLE_INTERVAL_SEC)
-
-        self.loop.create_task(sampler())
-
-        # Wait until quit
+        # Wait until quit signal from UI
         await self.stop_event.wait()
 
         # Cleanup BLE
@@ -552,7 +556,7 @@ class DualCollector:
 
 
 def main():
-    print("MyoWare 2.0 Dual Collector — fixed-rate (100 Hz), synced timestamps")
+    print("MyoWare 2.0 Dual Collector — per-packet sampling (no fixed-rate sampler)")
     print("Sensors: M1 & M2 (see SENSORS list)")
     print("Labels: [1] flat hand, [2] closed fist")
     print("Data saved in 'dual_emg' (two CSVs + PNGs per session).")

@@ -20,8 +20,8 @@ from typing import List
 from threading import Lock
 
 # ---------- Preferred device (auto-connect) ----------
-PREFERRED_ADDR = "88:13:BF:14:F7:1E"
-PREFERRED_NAME = "MyoWareSensor1"
+PREFERRED_ADDR = "88:13:BF:13:67:56"
+PREFERRED_NAME = "MyoWareSensor2"
 
 # ---------- Fixed motion labels ----------
 LABELS = {
