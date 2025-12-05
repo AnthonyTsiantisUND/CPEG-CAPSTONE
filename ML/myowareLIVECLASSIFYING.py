@@ -8,23 +8,23 @@ import sys
 print("RUNNING FILE:", sys.argv[0])
 
 
-# ------------------------------------------------------------
-# CONFIG
-# ------------------------------------------------------------
-
+# config info
 M1_ADDR = "88:13:BF:14:F7:1E"
 M2_ADDR = "88:13:BF:13:67:56"
 CHAR_UUID = "f3a56edf-8f1e-4533-93bf-5601b2e91308"
 
 WINDOW_SIZE = 50
 STEP_SIZE = 10
-USE_PCA = False  # IMPORTANT: PCA must be disabled
+USE_PCA = False  
 PREDICTION_SMOOTH_WINDOW = 5
 
 CLASS_TO_IMAGE = {
     "flat_hand": "3DIMG/flat_hand.png",
     "closed_fist": "3DIMG/closed_fist.png",
-    "pinch": "3DIMG/pinch.png"
+    "pinch": "3DIMG/pinch.png", 
+    "loser": "3DIMG/l_hand.png",
+    "point": "one_finger_up.png",
+    "poke": "one_finger_out.png"
 }
 
 print("\nLoading ML pipeline...\n")
@@ -33,10 +33,7 @@ model = joblib.load("ML/best_svm_model.pkl")
 print("\nModels loaded.\n")
 
 
-# ------------------------------------------------------------
-# FEATURE EXTRACTION
-# ------------------------------------------------------------
-
+# feature extraction 
 def compute_features(signal):
     s = np.asarray(signal, dtype=float)
     return {
@@ -52,7 +49,7 @@ def compute_features(signal):
 
 
 def window_to_vector(win1, win2):
-    # EXACT 8 FEATURES PER SENSOR → 16 TOTAL
+    # 8 features per sensor --> 16 total 
     keys = [
         "rms",
         "mean_abs",
@@ -76,10 +73,7 @@ def window_to_vector(win1, win2):
     return combined
 
 
-# ------------------------------------------------------------
-# BLE STREAMING HANDLER
-# ------------------------------------------------------------
-
+# stream handling
 class EMGStream:
     def __init__(self):
         self.buffer = []
@@ -102,16 +96,12 @@ M1 = EMGStream()
 M2 = EMGStream()
 
 
-# ------------------------------------------------------------
-# CLASSIFICATION
-# ------------------------------------------------------------
-
+# classification task
 prediction_history = []
 
 def classify(win1, win2):
     x = window_to_vector(win1, win2)
 
-    # SCALE ONLY — PCA IS NOT USED IN THE TRAINED MODEL
     x = scaler.transform(x)
 
     print("AFTER SCALER SHAPE =", x.shape)
@@ -127,10 +117,7 @@ def classify(win1, win2):
     return smoothed
 
 
-# ------------------------------------------------------------
-# IMAGE DISPLAY
-# ------------------------------------------------------------
-
+# display images 
 current_image_class = None
 
 def show_prediction_image(pred_class):
@@ -150,10 +137,7 @@ def show_prediction_image(pred_class):
     cv2.waitKey(1)
 
 
-# ------------------------------------------------------------
-# MAIN LOOP
-# ------------------------------------------------------------
-
+# main loop!
 async def run_live():
     print("Connecting to MyoWare sensors...\n")
 
