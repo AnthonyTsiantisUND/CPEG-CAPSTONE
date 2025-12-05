@@ -22,8 +22,8 @@ USE_PCA = False  # IMPORTANT: PCA must be disabled
 PREDICTION_SMOOTH_WINDOW = 5
 
 CLASS_TO_IMAGE = {
-    "flat": "3DIMG/flat_hand.png",
-    "fist": "3DIMG/closed_fist.png",
+    "flat_hand": "3DIMG/flat_hand.png",
+    "closed_fist": "3DIMG/closed_fist.png",
     "pinch": "3DIMG/pinch.png"
 }
 
