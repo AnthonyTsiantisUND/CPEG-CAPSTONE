@@ -173,6 +173,17 @@ class Arm():
                 sleep(0.05)
         
         self.set_servo_pos(14, self.arm[14].default_pos)
+    
+    def the_bird(self):
+        self.close_pinkie_finger()
+        self.close_ring_finger()
+        self.close_pointer_finger()
+        self.close_thumb()
+    
+    def peace(self):
+        self.close_pinkie_finger()
+        self.close_ring_finger()
+        self.close_thumb()
         
 menu = \
 """
@@ -193,7 +204,9 @@ Select an action
 14) Close fist
 15) Left/Right Wave
 16) Top/Down Wave
-17) Quit
+17) The Bird
+18) Peace
+19) Quit
 """
 arm = Arm()
 while True:
@@ -232,6 +245,10 @@ while True:
     elif choice == 16:
         arm.top_down_wave()
     elif choice == 17:
+        arm.the_bird()
+    elif choice == 18:
+        arm.peace()
+    elif choice == 19:
         break
     else:
         print("Invalid selection")
