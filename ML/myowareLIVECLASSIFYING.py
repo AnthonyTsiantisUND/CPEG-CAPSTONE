@@ -3,9 +3,7 @@ import numpy as np
 import joblib
 from bleak import BleakClient
 
-# -------------------------------
-#  SENSOR CONFIG
-# -------------------------------
+# sensor config
 M1_ADDR = "88:13:BF:14:F7:1E"
 M2_ADDR = "88:13:BF:13:67:56"
 CHAR_UUID = "f3a56edf-8f1e-4533-93bf-5601b2e91308"
@@ -13,21 +11,18 @@ CHAR_UUID = "f3a56edf-8f1e-4533-93bf-5601b2e91308"
 WINDOW_SIZE = 50
 STEP_SIZE = 10
 
-# -------------------------------
-#  LOAD MODELS (Your Directory!)
-# -------------------------------
+# loaf in the models
 print("Loading models...")
 
 scaler = joblib.load("ML/scaler.pkl")
 model = joblib.load("ML/best_svm_model.pkl")
+pca = joblib.load("ML/pca.pkl")
 
-USE_PCA = False   # You do NOT have a PCA pickle
+USE_PCA = True  
 print("Loaded scaler + SVM.\n")
 
 
-# -------------------------------
-#  FEATURE EXTRACTION
-# -------------------------------
+# feature extraction
 def compute_features(signal):
     s = np.asarray(signal).astype(float)
     feats = {}
@@ -59,9 +54,7 @@ def window_to_vector(win1, win2):
     return combined
 
 
-# -------------------------------
-#  LIVE STREAM HANDLERS
-# -------------------------------
+# stream handlers??
 class EMGStream:
     def __init__(self):
         self.buffer = []
@@ -83,18 +76,14 @@ M1 = EMGStream()
 M2 = EMGStream()
 
 
-# -------------------------------
-#  CLASSIFIER
-# -------------------------------
+# classification task
 def classify(win1, win2):
     x = window_to_vector(win1, win2)
     x = scaler.transform(x)
     return model.predict(x)[0]
 
 
-# -------------------------------
-#  MAIN LOOP
-# -------------------------------
+# main 
 async def run_live():
     print("Connecting to sensors...")
 
