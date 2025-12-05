@@ -119,16 +119,55 @@ class Arm():
         print(f"Moved {self.arm[servo_id].name} to {new_pos}")
         # sleep(0.25)
 
-    
-    def neutral_position(self):
+    def close_pointer_finger(self):
+        self.set_servo_pos(3, 180)
+        self.set_servo_pos(4, 180)
+
+    def close_middle_finger(self):
+        self.set_servo_pos(6, 180)
+        self.set_servo_pos(7, 180)
+
+    def close_ring_finger(self):
+        self.set_servo_pos(9, 180)
+        self.set_servo_pos(10, 180)
+
+    def close_pinkie_finger(self):
+        self.set_servo_pos(12, 180)
+        self.set_servo_pos(13, 180)
+
+    def close_thumb(self):
+        self.set_servo_pos(1, 180)
+
+    def open_pointer_finger(self):
+        self.set_servo_pos(3, 0)
+        self.set_servo_pos(4, 0)
+
+    def open_middle_finger(self):
+        self.set_servo_pos(6, 0)
+        self.set_servo_pos(7, 0)
+
+    def open_ring_finger(self):
+        self.set_servo_pos(9, 0)
+        self.set_servo_pos(10, 0)
+
+    def open_pinkie_finger(self):
+        self.set_servo_pos(12, 0)
+        self.set_servo_pos(13, 0)
+
+    def open_thumb(self):
+        self.set_servo_pos(1, 0)
+
+
+    def reset(self):
         for servo in self.arm:
             self.set_servo_pos(servo.pca_id, servo.default_pos)
-
-    def closed_fist(self):
-        self.neutral_position()
-        # Move all fingers to full closed position
-        for servo_id in [1, 3, 4, 6, 7, 9, 10, 12, 13]:
-            self.arm.set_servo_pos(servo_id, 180)
+        
+    def close_fist(self):
+        self.close_pointer_finger()
+        self.close_middle_finger()
+        self.close_ring_finger()
+        self.close_pinkie_finger()
+        self.close_thumb()
 
 menu = \
 """
@@ -142,9 +181,9 @@ while True:
     print(menu)
     choice = int(input("$ "))
     if choice == 1:
-        arm.neutral_position()
+        arm.reset()
     elif choice == 2:
-        arm.closed_fist()
+        arm.close_fist()
     elif choice == 3:
         break
     else:
