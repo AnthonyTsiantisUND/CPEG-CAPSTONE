@@ -8,8 +8,10 @@ Q: Quit
 """
 
 kit = ServoKit(channels=16)
+kit.servo[6].angle = 180
+curr_pos = 180
 while True:
-    servo = 2#int(input("Enter servo ID: "))
+    servo = 0#int(input("Enter servo ID: "))
     print(menu)
     movement = input("$ ")
     
@@ -17,17 +19,15 @@ while True:
         break
     
     if movement.lower() == "a":
-        if servos[servo].within_bounds(servos[servo].position + 10):
-            kit.servo[servo].angle = servos[servo].position + 10
-            servos[servo].position += 10
+        curr_pos += 10
+        kit.servo[servo].angle = curr_pos
             
     elif movement.lower() == "d":
-        if servos[servo].within_bounds(servos[servo].position - 10):
-            kit.servo[servo].angle = servos[servo].position - 10
-            servos[servo].position -= 10
+        curr_pos -= 10
+        kit.servo[servo].angle = curr_pos
     else:
         print(f"Invalid input {movement}")
         
-    print(f"Servo {servos[servo].name} at {servos[servo].position}")
+    print(f"Current Position: {curr_pos}")
     
-    sleep(1)
+    sleep(0.5)
