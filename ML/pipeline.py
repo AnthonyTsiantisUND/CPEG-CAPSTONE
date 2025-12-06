@@ -303,8 +303,8 @@ def load_ml():
     if _scaler is None or _model is None:
         print("\nLoading ML pipeline...\n")
         base_dir = os.path.dirname(os.path.abspath(__file__))
-        _scaler = joblib.load(os.path.join(base_dir, "ML", "scaler.pkl"))
-        _model = joblib.load(os.path.join(base_dir, "ML", "best_svm_model.pkl"))
+        _scaler = joblib.load(os.path.join(base_dir,"scaler.pkl"))
+        _model = joblib.load(os.path.join(base_dir,"best_svm_model.pkl"))
         print("Models loaded.\n")
     return _scaler, _model
 
