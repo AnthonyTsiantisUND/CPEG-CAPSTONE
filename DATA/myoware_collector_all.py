@@ -25,10 +25,16 @@ SENSORS = [
 LABELS = {
     "1": ("flat hand", "flat_hand"),
     "2": ("closed fist", "closed_fist"),
+    "3":("pointer finger", "pointer_finger")
 }
 
-DATA_DIR = "dual_emg"
+# Folder where this script lives (should be .../CPEG-CAPSTONE/DATA)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# dual_emg *inside* the DATA folder
+DATA_DIR = os.path.join(BASE_DIR, "dual_emg")
 os.makedirs(DATA_DIR, exist_ok=True)
+
 
 # Windows BLE loop policy
 if sys.platform == "win32":
@@ -152,7 +158,7 @@ class DualCollector:
         return "label: (press 1/2)"
 
     def _set_title(self):
-        base = "[1] flat hand   [2] closed fist   |   Q: quit"
+        base = "[1] flat hand   [2] closed fist  [3] pointer finger  |   Q: quit"
         status = self._label_status()
         if self.recording:
             total = sum(len(s.rows) for s in self.sensors.values())
@@ -341,7 +347,7 @@ class DualCollector:
             print(f"[INFO] ({sid}) Notify started.")
 
         print("\n✓ Both sensors streaming. Controls:")
-        print("   [1] flat hand   [2] closed fist")
+        print("   [1] flat hand   [2] closed fist  [3] pointer finger")
         print("   SPACE: start/stop recording (both sensors)")
         print("   Q: quit\n")
 
@@ -437,7 +443,7 @@ class DualCollector:
         if k == " ":
             if not self.recording:
                 if not self.label_slug:
-                    print("Choose a label first: press 1 or 2.")
+                    print("Choose a label first: press 1,2, or 3.")
                     return
                 self._reset_session_view()
                 self.recording = True
