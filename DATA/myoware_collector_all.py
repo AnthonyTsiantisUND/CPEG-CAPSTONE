@@ -25,7 +25,7 @@ SENSORS = [
 LABELS = {
     "1": ("flat hand", "flat_hand"),
     "2": ("closed fist", "closed_fist"),
-    "3":("pointer finger", "pointer_finger")
+    "3":("peace sign", "peace_sign")
 }
 
 # Folder where this script lives (should be .../CPEG-CAPSTONE/DATA)
@@ -158,7 +158,7 @@ class DualCollector:
         return "label: (press 1/2)"
 
     def _set_title(self):
-        base = "[1] flat hand   [2] closed fist  [3] pointer finger  |   Q: quit"
+        base = "[1] flat hand   [2] closed fist  [3] peace sign  |   Q: quit"
         status = self._label_status()
         if self.recording:
             total = sum(len(s.rows) for s in self.sensors.values())
@@ -347,7 +347,7 @@ class DualCollector:
             print(f"[INFO] ({sid}) Notify started.")
 
         print("\n✓ Both sensors streaming. Controls:")
-        print("   [1] flat hand   [2] closed fist  [3] pointer finger")
+        print("   [1] flat hand   [2] closed fist  [3] peace sign")
         print("   SPACE: start/stop recording (both sensors)")
         print("   Q: quit\n")
 
