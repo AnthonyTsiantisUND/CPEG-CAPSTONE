@@ -18,13 +18,12 @@ STEP_SIZE = 10
 USE_PCA = False  
 PREDICTION_SMOOTH_WINDOW = 5
 
+
+# only 3 labels in the data set
 CLASS_TO_IMAGE = {
     "flat_hand": "3DIMG/flat_hand.png",
     "closed_fist": "3DIMG/closed_fist.png",
-    "pinch": "3DIMG/pinch.png", 
-    "loser": "3DIMG/l_hand.png",
-    "point": "one_finger_up.png",
-    "poke": "one_finger_out.png"
+    "peace": "3DIMG/peace.png",
 }
 
 print("\nLoading ML pipeline...\n")
