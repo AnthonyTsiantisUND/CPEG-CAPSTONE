@@ -142,28 +142,35 @@ class Arm():
         self.set_servo_pos(1, 180)
 
     def open_pointer_finger(self):
+        show_image(self._images["flat_hand"])
         self.set_servo_pos(3, 0)
         self.set_servo_pos(4, 0)
 
     def open_middle_finger(self):
+        show_image(self._images["flat_hand"])
         self.set_servo_pos(6, 180)
         self.set_servo_pos(7, 0)
 
     def open_ring_finger(self):
+        show_image(self._images["flat_hand"])
         self.set_servo_pos(9, 0)
         self.set_servo_pos(10, 0)
 
     def open_pinkie_finger(self):
+        show_image(self._images["flat_hand"])
         self.set_servo_pos(12, 0)
         self.set_servo_pos(13, 0)
 
     def open_thumb(self):
+        show_image(self._images["flat_hand"])
         self.set_servo_pos(1, 0)
 
 
     def reset(self):
+        show_image(self._images["flat_hand"])
         for servo in self.arm:
             self.set_servo_pos(servo.pca_id, servo.default_pos)
+        
         
     def close_fist(self):
         show_image(self._images["closed_fist"])
