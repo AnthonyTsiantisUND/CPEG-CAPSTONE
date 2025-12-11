@@ -15,6 +15,28 @@ def show_image(path):
     cv2.imshow("hand pose", img)
     cv2.waitKey(1)
     
+def show_video(path):
+    if os.path.exists(path):
+        print("video not found at {path}")
+        return
+    cap = cv2.VideoCapture(path)
+    if not cap.isOpened():
+        print(f"failed to load video: {path}")
+        return
+    
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            break # video over
+        
+        cv2.imshow("hand pose", frame)
+        
+        # 25 ms/ frame
+        if cv2.waitKey(25):
+            break
+        
+        cap.release()
+    
 class Servo:
     def __init__(self, name, pca_id, default_pos, start_deg, end_deg):
         # Identification
@@ -86,6 +108,11 @@ class Arm():
             "thumb_down":"3DIMG/thumb_down.png",
             "the_bird":"3DIMG/bird.png"
             }
+        
+        self._videos = {
+            "wave":"3DIMG/r_l_wave.mov",
+            "f_b_wave":"3DIMG/f_b_wave.mov"
+        }
             
         self.kit = kit = ServoKit(channels=16)
         
@@ -181,6 +208,7 @@ class Arm():
         self.close_thumb()
         
     def left_right_wave(self):
+        show_video(self._videos["wave"])
         # Tilt wrist down slightly
         self.set_servo_pos(14, 120)
         
@@ -205,6 +233,7 @@ class Arm():
         self.reset_lats()
         
     def top_down_wave(self):
+        show_video(self._videos["f_b_wave"])
         # Tilt wrist down slightly
         self.set_servo_pos(14, self.arm[14].default_pos)
         for _ in range(5):
