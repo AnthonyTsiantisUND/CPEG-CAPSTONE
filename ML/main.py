@@ -1,6 +1,18 @@
 from time import sleep
 from adafruit_servokit import ServoKit
+from PIL import Image
+import os
 
+def show_image(path):
+    if not os.path.exists(path):
+        print(f"image not found at {path}")
+        return
+    try:
+        img = Image.open(path)
+        img.show()
+        print(f"showing image at {path}")
+    except Exception as e:
+        print(f"could not display image --> {e}")
 class Servo:
     def __init__(self, name, pca_id, default_pos, start_deg, end_deg):
         # Identification
@@ -58,6 +70,21 @@ class Arm():
             self.top_wrist,
             self.bottom_wrist
         ]
+        
+        self._images = {
+            "spock": "../3DIMG/spock.png",
+            "closed_fist": "3DIMG/closed_fist.png",
+            "flat_hand":"../3DIMG/flat_hand.png",
+            "middle_down":"../3DIMG/middle_down.png",
+            "pointer_down":"../3DIMG/one_finger_out.png",
+            "peace":"../3DIMG/peace.png",
+            "pinky_down":"../3DIMG/pinky_down.png",
+            "ring_down":"../3DIMG/ring_down.png",
+            "rock_and_roll":"../3DIMG/rock_and_roll.png",
+            "thumb_down":"../3DIMG/thumb_down.png",
+            "the_bird":"../3DIMG/bird.png"
+            }
+            
         self.kit = kit = ServoKit(channels=16)
         
         # Set hand to default positioning
@@ -81,6 +108,7 @@ class Arm():
         self.set_servo_pos(11, self.arm[11].default_pos) # Pinkie
     
     def spock(self):
+        show_image(self._images["spock"])
         self.set_servo_pos(2, 30) # Pointer
         self.set_servo_pos(5, 30) # Middle
         self.set_servo_pos(8, 130) # Ring
@@ -130,6 +158,7 @@ class Arm():
             self.set_servo_pos(servo.pca_id, servo.default_pos)
         
     def close_fist(self):
+        show_image(self._images["closed_fist"])
         self.close_pointer_finger()
         self.close_middle_finger()
         self.close_ring_finger()
