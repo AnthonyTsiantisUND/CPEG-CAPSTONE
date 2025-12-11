@@ -1,18 +1,20 @@
 from time import sleep
 from adafruit_servokit import ServoKit
-from PIL import Image
 import os
+import cv2
 
 def show_image(path):
     if not os.path.exists(path):
         print(f"image not found at {path}")
         return
-    try:
-        img = Image.open(path)
-        img.show()
-        print(f"showing image at {path}")
-    except Exception as e:
-        print(f"could not display image --> {e}")
+    img = cv2.imread(path)
+    if img is None:
+        print(f"failed to load image: {path}")
+        return
+    
+    cv2.imshow("hand pose", img)
+    cv2.waitKey(1)
+    
 class Servo:
     def __init__(self, name, pca_id, default_pos, start_deg, end_deg):
         # Identification
@@ -72,17 +74,17 @@ class Arm():
         ]
         
         self._images = {
-            "spock": "../3DIMG/spock.png",
+            "spock": "3DIMG/spock.png",
             "closed_fist": "3DIMG/closed_fist.png",
-            "flat_hand":"../3DIMG/flat_hand.png",
-            "middle_down":"../3DIMG/middle_down.png",
-            "pointer_down":"../3DIMG/one_finger_out.png",
-            "peace":"../3DIMG/peace.png",
-            "pinky_down":"../3DIMG/pinky_down.png",
-            "ring_down":"../3DIMG/ring_down.png",
-            "rock_and_roll":"../3DIMG/rock_and_roll.png",
-            "thumb_down":"../3DIMG/thumb_down.png",
-            "the_bird":"../3DIMG/bird.png"
+            "flat_hand":"3DIMG/flat_hand.png",
+            "middle_down":"3DIMG/middle_down.png",
+            "pointer_down":"3DIMG/one_finger_out.png",
+            "peace":"3DIMG/peace.png",
+            "pinkie_down":"3DIMG/pinky_down.png",
+            "ring_down":"3DIMG/ring_down.png",
+            "rock_and_roll":"3DIMG/rock_and_roll.png",
+            "thumb_down":"3DIMG/thumb_down.png",
+            "the_bird":"3DIMG/bird.png"
             }
             
         self.kit = kit = ServoKit(channels=16)
@@ -101,6 +103,7 @@ class Arm():
         # sleep(0.25)
         
     def reset_lats(self):
+        show_image(self._images["flat_hand"])
         self.set_servo_pos(0, self.arm[0].default_pos) # Thumb
         self.set_servo_pos(2, self.arm[2].default_pos) # Pointer
         self.set_servo_pos(5, self.arm[5].default_pos) # Middle
@@ -115,22 +118,27 @@ class Arm():
         self.set_servo_pos(11, 90) # Pinkie
 
     def close_pointer_finger(self):
+        show_image(self._images["pointer_down"])
         self.set_servo_pos(3, 180)
         self.set_servo_pos(4, 180)
 
     def close_middle_finger(self):
+        show_image(self._images["middle_down"])
         self.set_servo_pos(6, 0)
         self.set_servo_pos(7, 180)
 
     def close_ring_finger(self):
+        show_image(self._images["ring_down"])
         self.set_servo_pos(9, 180)
         self.set_servo_pos(10, 180)
 
     def close_pinkie_finger(self):
+        show_image(self._images["pinkie_down"])
         self.set_servo_pos(12, 180)
         self.set_servo_pos(13, 180)
 
     def close_thumb(self):
+        show_image(self._images["thumb_down"])
         self.set_servo_pos(1, 180)
 
     def open_pointer_finger(self):
@@ -207,12 +215,13 @@ class Arm():
         self.close_pinkie_finger()
         self.close_ring_finger()
         self.close_pointer_finger()
-        self.close_thumb()
+        show_image(self._images["the_bird"])
     
     def peace(self):
         self.close_pinkie_finger()
         self.close_ring_finger()
         self.close_thumb()
+        show_image(self._images["peace"])
         
 menu = \
 """
@@ -238,6 +247,10 @@ Select an action
 19) Quit
 """
 arm = Arm()
+# initialize window
+cv2.namedWindow("hand pose", cv2.WINDOW_NORMAL)
+cv2.resizeWindow("hand pose", 400, 400)
+
 while True:
     print(menu)
     choice = int(input("$ "))
