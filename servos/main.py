@@ -259,6 +259,12 @@ class Arm():
         self.close_ring_finger()
         self.close_thumb()
         show_image(self._images["peace"])
+    
+    def rock_hands(self):
+        self.reset()
+        self.close_middle_finger()
+        self.close_ring_finger()
+        show_image(self._images["rock_and_roll"])
 
 def run():
     menu = \
@@ -282,7 +288,8 @@ def run():
     16) Top/Down Wave
     17) The Bird
     18) Peace
-    19) Quit
+    19) Rock Hands
+    20) Quit
     """
     arm = Arm()
     # initialize window
@@ -291,47 +298,52 @@ def run():
 
     while True:
         print(menu)
-        choice = int(input("$ "))
-        if choice == 1:
-            arm.reset_lats()
-        elif choice == 2:
-            arm.spock()
-        elif choice == 3:
-            arm.reset()
-        elif choice == 4:
-            arm.close_thumb()
-        elif choice == 5:
-            arm.open_thumb()  
-        elif choice == 6:
-            arm.close_pointer_finger()
-        elif choice == 7:
-            arm.open_pointer_finger()
-        elif choice == 8:
-            arm.close_middle_finger()
-        elif choice == 9:
-            arm.open_middle_finger()
-        elif choice == 10:
-            arm.close_ring_finger()
-        elif choice == 11:
-            arm.open_ring_finger()
-        elif choice == 12:
-            arm.close_pinkie_finger()
-        elif choice == 13:
-            arm.open_pinkie_finger()
-        elif choice == 14:
-            arm.close_fist()
-        elif choice == 15:
-            arm.left_right_wave()
-        elif choice == 16:
-            arm.top_down_wave()
-        elif choice == 17:
-            arm.the_bird()
-        elif choice == 18:
-            arm.peace()
-        elif choice == 19:
-            break
-        else:
-            print("Invalid selection")
+        try:
+            choice = int(input("$ "))
+            if choice == 1:
+                arm.reset_lats()
+            elif choice == 2:
+                arm.spock()
+            elif choice == 3:
+                arm.reset()
+            elif choice == 4:
+                arm.close_thumb()
+            elif choice == 5:
+                arm.open_thumb()  
+            elif choice == 6:
+                arm.close_pointer_finger()
+            elif choice == 7:
+                arm.open_pointer_finger()
+            elif choice == 8:
+                arm.close_middle_finger()
+            elif choice == 9:
+                arm.open_middle_finger()
+            elif choice == 10:
+                arm.close_ring_finger()
+            elif choice == 11:
+                arm.open_ring_finger()
+            elif choice == 12:
+                arm.close_pinkie_finger()
+            elif choice == 13:
+                arm.open_pinkie_finger()
+            elif choice == 14:
+                arm.close_fist()
+            elif choice == 15:
+                arm.left_right_wave()
+            elif choice == 16:
+                arm.top_down_wave()
+            elif choice == 17:
+                arm.the_bird()
+            elif choice == 18:
+                arm.peace()
+            elif choice == 19:
+                arm.rock_hands()
+            elif choice == 20:
+                break
+            else:
+                print("Invalid selection")
+        except Exception as e:
+            print(e)
 
 if __name__ == '__main__':
     run()
